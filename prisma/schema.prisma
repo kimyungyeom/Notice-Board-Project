@@ -1,11 +1,77 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+// Users 테이블
+model Users {
+  userId    Int      @id @default(autoincrement()) @map("userId")
+  email     String   @unique @map("email")
+  password  String   @map("password")
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  // 사용자 테이블과 사용자 정보 테이블 1:1 관계 설정
+  UserInfos UserInfos?
+  // 사용자 테이블과 게시글 테이블이 1:N 관계 설정
+  Posts     Posts[]
+  // 사용자 테이블과 댓글 테이블이 1:N 관계 설정
+  Comments  Comments[]
+
+  @@map("Users")
+}
+
+// posts 테이블
+model Posts {
+  postId    Int      @id @default(autoincrement()) @map("postId")
+  UserId    Int      @map("UserId") // 사용자(Users) 테이블을 참조하는 외래키
+  title     String   @map("title")
+  content   String   @map("content") @db.Text
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  // Users 테이블과 관계를 설정
+  User     Users      @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  // 게시글 테이블과 댓글 테이블 1:N 관계설정
+  Comments Comments[]
+
+  @@map("Posts")
+}
+
+// UsersInfos 테이블
+model UserInfos {
+  userInfoId   Int      @id @default(autoincrement()) @map("userInfoId")
+  UserId       Int      @unique @map("UserId") // 사용자(Users) 테이블을 참조하는 외래키
+  name         String   @map("name")
+  age          Int?     @map("age")
+  gender       String   @map("gender")
+  profileImage String?  @map("profileImage")
+  createdAt    DateTime @default(now()) @map("createdAt")
+  updatedAt    DateTime @updatedAt @map("updatedAt")
+
+  // Users 테이블과 관계를 설정
+  User Users @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+
+  @@map("UserInfos")
+}
+
+// Comments 테이블
+model Comments {
+  commentId Int      @id @default(autoincrement()) @map("commentId")
+  PostId    Int      @map("PostId") // 게시글(Posts) 테이블을 참조하는 외래키
+  UserId    Int      @map("UserId") // 사용자(Users) 테이블을 참조하는 외래키
+  content   String   @map("content")
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  // Posts 테이블과 관계를 설정
+  Post Posts @relation(fields: [PostId], references: [postId], onDelete: Cascade)
+  // Users 테이블과 관계를 설정
+  User Users @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+
+  @@map("Comments")
 }
