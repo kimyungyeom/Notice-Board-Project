@@ -10,42 +10,46 @@ const router = express.Router();
 
 // 회원가입 API
 router.post("/sing-up", async (req, res, next) => {
-	const { email, password, name, age, gender, profileImage } = req.body;
+	try {
+		const { email, password, name, age, gender, profileImage } = req.body;
 
-	// 이메일 중복 체크
-	const isExistUser = await prisma.users.findFirst({ where: { email } });
-	if (isExistUser) {
-		return res
-			.status(409)
-			.json({ errorMessage: "이미 존재하는 이메일 입니다." });
+		// 이메일 중복 체크
+		const isExistUser = await prisma.users.findFirst({ where: { email } });
+		if (isExistUser) {
+			return res
+				.status(409)
+				.json({ errorMessage: "이미 존재하는 이메일 입니다." });
+		}
+
+		// 비밀번호 암호화
+		const hashedPassword = await bcrypt.hash(password, 10);
+
+		// Users 테이블에 사용자 생성
+		const user = await prisma.users.create({
+			data: {
+				email,
+				password: hashedPassword,
+			},
+		});
+
+		//  UserInfos 테이블에 사용자 정보 생성
+		const userInfo = await prisma.userInfos.create({
+			data: {
+				UserId: user.userId,
+				name,
+				age,
+				gender: gender.toUpperCase(), // 전달받은 gender를 대문자로 변환
+				profileImage,
+			},
+		});
+
+		return res.status(201).json({
+			message: "회원가입이 완료되었습니다.",
+			data: userInfo,
+		});
+	} catch (err) {
+		next(err);
 	}
-
-	// 비밀번호 암호화
-	const hashedPassword = await bcrypt.hash(password, 10);
-
-	// Users 테이블에 사용자 생성
-	const user = await prisma.users.create({
-		data: {
-			email,
-			password: hashedPassword,
-		},
-	});
-
-	//  UserInfos 테이블에 사용자 정보 생성
-	const userInfo = await prisma.userInfos.create({
-		data: {
-			UserId: user.userId,
-			name,
-			age,
-			gender: gender.toUpperCase(), // 전달받은 gender를 대문자로 변환
-			profileImage,
-		},
-	});
-
-	return res.status(201).json({
-		message: "회원가입이 완료되었습니다.",
-		data: userInfo,
-	});
 });
 
 // 로그인 API
