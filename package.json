@@ -2,17 +2,18 @@
 	"name": "community-project",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
+	"main": "app.js",
 	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "nodemon app.js"
+		"dev": "nodemon src/app.js"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"@prisma/client": "^5.6.0",
+		"bcrypt": "^5.1.1",
 		"cookie-parser": "^1.4.6",
 		"express": "^4.18.2",
 		"jsonwebtoken": "^9.0.2",
