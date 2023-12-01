@@ -110,5 +110,5 @@ router.get("/users", authMiddleware, async (req, res, next) => {
 	return res.status(200).json({ data: user });
 });
 
-// 모듈 내보내기
+// router 내보내기
 export default router;
