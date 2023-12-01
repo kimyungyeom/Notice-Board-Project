@@ -1,0 +1,27 @@
+@port=http://localhost:3018
+
+### 회원 가입
+POST {{port}}/api/sing-up
+Content-Type: application/json
+
+{
+    "email": "admin5@admin.com",
+    "password": "test1234",
+    "name": "관리자",
+    "age": 25,
+    "gender": "남성",
+    "profileImage" :"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXE6Y0LEsTMuXNK9INkxIeY8y3uEjgKxggbMkgK5v9bw&s"
+}
+
+### 로그인
+POST {{port}}/api/sing-in
+Content-Type: application/json
+
+{
+    "email": "admin5@admin.com",
+    "password": "test1234"
+}
+
+### 사용자 조회 
+GET {{port}}/api/users
+Content-Type: application/json
