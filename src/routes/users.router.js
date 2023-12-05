@@ -2,7 +2,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../utils/prisma/index.js";
-import jwt from "jsonwebtoken";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import { Prisma } from "@prisma/client";
 
@@ -77,16 +76,9 @@ router.post("/sing-in", async (req, res, next) => {
 		return res.status(401).json({ errorMessage: "로그인에 실패하였습니다." });
 	}
 
-	// 로그인 성공 시 JWT 발급
-	const token = jwt.sign(
-		{
-			userId: user.userId,
-		},
-		"token_secret_key", // token 비밀키. env를 이용하여 코드를 숨겨야한다.
-	);
+	// 로그인 성공 시 세션에 Id 발급
+	req.session.userId = user.userId;
 
-	// 쿠키에 토큰 저장
-	res.cookie("authorization", `Bearer ${token}`);
 	return res.status(200).json({ message: "로그인에 성공하였습니다." });
 });
 
